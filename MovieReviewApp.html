@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <input id="input" placeholder="Enter name of movie">
+    <h1 id="title"></h1>
+    <h2 id="rating"></h2>
+    <h5 id="first"></h5>
+    <h5 id="second"></h5>
+    <h5 id="third"></h5>
+    <img id="img">
+    <p id="para"></p>
+    <button id="btn"> More Information</button>
+    <div id=div2></div>
+    <div id="diview"><button id="review" onclick="writeReview()"> Write a Review </button></div>
+    <div id="divname"></div>
+    <div id="divput"></div>
+    <div id="divtn"></div>
+    <h6 id="showDatabase"></h6>
+    <header id="scroller"></header>
+
+    <style>
+        #scroller {
+            position: fixed;
+            bottom: 0px;
+        }
+
+        #title {
+            font-family: fantasy;
+        }
+
+        #rating {
+            font-family: fantasy;
+        }
+
+        #review {
+            margin-top: 25px;
+            height: 30px;
+            width: 120px;
+        }
+
+        #divput {
+            margin-top: 10px;
+        }
+
+        #divname {
+            margin-top: 25px;
+        }
+
+        #para {
+            width: 500px;
+            font-family: fantasy;
+        }
+
+        body {
+            background-color: #F7F9FD;
+        }
+
+        #input {
+            width: 25%;
+            height: 45px;
+            padding-right: 60px;
+            font-family: fantasy;
+        }
+
+        #btn {
+            height: 45px;
+            width: 120px;
+            background: white;
+            visibility: hidden;
+            cursor: pointer;
+            font-family: fantasy;
+        }
+
+        #review {
+            height: 50px;
+            width: 120px;
+            background: white;
+            visibility: hidden;
+            cursor: pointer;
+            font-family: fantasy;
+        }
+
+        #divput {
+            height: 50px
+        }
+    </style>
+
+    <script src="https://www.gstatic.com/firebasejs/8.3.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.0/firebase-database.js"></script>
+    <script>
+        var firebaseConfig = {
+            apiKey: "AIzaSyBbhv15gMf8sk2ZkZhebewd1cKU7JuS4cs",
+            authDomain: "new-test-b6d41.firebaseapp.com",
+            databaseURL: "https://new-test-b6d41.firebaseio.com",
+            projectId: "new-test-b6d41",
+            storageBucket: "new-test-b6d41.appspot.com",
+            messagingSenderId: "1047226543904",
+            appId: "1:1047226543904:web:44da850d36ae5fceea7145"
+        };
+        firebase.initializeApp(firebaseConfig);
+    </script>
+    <script>
+        function movie() {
+            var replaceInArray = function (str) {
+                return str.replace(/\s+/g, "+") //this line of code outlines the process of replacing spaces with "+"
+            }
+            var arr = []
+            var string = input.value; //stores the user input into the variable "string"
+            arr.push(string); //user input is pushed into an empty array
+            arr.map(replaceInArray); //uses the code on lines 29 and 30 to replace spaces with "+"
+
+            var url = "https://www.omdbapi.com/?apikey=3dfcad8e&s=" + encodeURIComponent(input.value); //the end of this code (outside the quotation marks) adds the user input (edited to replace spaces with "+") to the end of the url
+            fetch(url) //this line is similar to inputting the URL on the browser address bar
+                .then(data => {//then is required to ensure that nothing happens until the internet responds
+                    return data.json()//this line converts to a readable format
+                })
+                .then(result => {//then is required to ensure that nothing happens until the internet responds
+                    console.log(result.Search[0])//this line returns the readable format into the console
+                    document.getElementById("first").innerHTML = "1. " + result.Search[0].Title;
+                    if (result.Search.length > 2) {
+                        document.getElementById("second").innerHTML = "2. " + result.Search[1].Title;
+                        document.getElementById("third").innerHTML = "3. " + result.Search[2].Title;
+                    }
+                    document.getElementById("first").addEventListener("click", function (event) {
+                        var arr1 = []
+                        var string2 = result.Search[0].Title;
+                        arr1.push(string2);
+                        select = arr1.map(replaceInArray);
+                        var url = "https://www.omdbapi.com/?apikey=3dfcad8e&t=" + encodeURIComponent(select)
+                        fetch(url)
+                            .then(data => {//then is required to ensure that nothing happens until the internet responds
+                                return data.json()//this line converts to a readable format
+                            })
+                            .then(result => {
+                                document.getElementById("first").innerHTML = ""
+                                document.getElementById("second").innerHTML = ""
+                                document.getElementById("third").innerHTML = ""
+                                document.getElementById("title").innerHTML = result.Title; //this line puts the movie title in the h1 element
+                                document.getElementById("rating").innerHTML = "Rotten Tomatoes: " + JSON.stringify(result.Ratings[1].Value); //this line puts the rating in the h2 element
+                                document.getElementById("para").innerHTML = result.Plot; //this line puts the plot in the paragraph element
+                                img.src = result.Poster; //this line inserts the poster on the browser page
+                                document.getElementById("btn").style.visibility = "visible";
+                                document.getElementById("review").style.visibility = "visible";
+                                document.getElementById("btn").addEventListener("click", function (event) {
+                                    para3 = document.createElement("p");
+                                    document.getElementById("div2").appendChild(para3);
+                                    para3.innerHTML = "Year: " + result.Year;
+                                    para3.id = "paragraph3"
+                                    para1 = document.createElement("p");
+                                    document.getElementById("div2").appendChild(para1);
+                                    para1.innerHTML = "Genre: " + result.Genre;
+                                    para1.id = "paragraph1"
+                                    para2 = document.createElement("p");
+                                    document.getElementById("div2").appendChild(para2);
+                                    para2.innerHTML = "Rating: " + result.Rated;
+                                    para2.id = "paragraph2"
+                                    document.getElementById("btn").remove();
+                                })
+
+                            })
+                    })
+                    document.getElementById("second").addEventListener("click", function (event) {
+                        var arr1 = []
+                        var string2 = result.Search[1].Title;
+                        arr1.push(string2);
+                        select = arr1.map(replaceInArray);
+                        var url = "https://www.omdbapi.com/?apikey=3dfcad8e&t=" + encodeURIComponent(select)
+                        fetch(url)
+                            .then(data => {//then is required to ensure that nothing happens until the internet responds
+                                return data.json()//this line converts to a readable format
+                            })
+                            .then(result => {
+                                document.getElementById("first").innerHTML = ""
+                                document.getElementById("second").innerHTML = ""
+                                document.getElementById("third").innerHTML = ""
+                                document.getElementById("title").innerHTML = result.Title; //this line puts the movie title in the h1 element
+                                document.getElementById("rating").innerHTML = "Rotten Tomatoes: " + JSON.stringify(result.Ratings[1].Value); //this line puts the rating in the h2 element
+                                document.getElementById("para").innerHTML = result.Plot; //this line puts the plot in the paragraph element
+                                img.src = result.Poster; //this line inserts the poster on the browser page
+                                document.getElementById("btn").style.visibility = "visible";
+                                document.getElementById("review").style.visibility = "visible";
+                                document.getElementById("btn").addEventListener("click", function (event) {
+                                    para3 = document.createElement("p");
+                                    document.getElementById("div2").appendChild(para3);
+                                    para3.innerHTML = "Year: " + result.Year;
+                                    para3.id = "paragraph3"
+                                    para1 = document.createElement("p");
+                                    document.getElementById("div2").appendChild(para1);
+                                    para1.innerHTML = "Genre: " + result.Genre;
+                                    para1.id = "paragraph1"
+                                    para2 = document.createElement("p");
+                                    document.getElementById("div2").appendChild(para2);
+                                    para2.innerHTML = "Rating: " + result.Rated;
+                                    para2.id = "paragraph2"
+                                    document.getElementById("btn").remove();
+                                })
+                            })
+                    })
+
+                    document.getElementById("third").addEventListener("click", function (event) {
+                        var arr1 = []
+                        var string2 = result.Search[2].Title;
+                        arr1.push(string2);
+                        select = arr1.map(replaceInArray);
+                        var url = "https://www.omdbapi.com/?apikey=3dfcad8e&t=" + encodeURIComponent(select)
+                        fetch(url)
+                            .then(data => {//then is required to ensure that nothing happens until the internet responds
+                                return data.json()//this line converts to a readable format
+                            })
+                            .then(result => {
+                                document.getElementById("first").innerHTML = ""
+                                document.getElementById("second").innerHTML = ""
+                                document.getElementById("third").innerHTML = ""
+                                document.getElementById("title").innerHTML = result.Title; //this line puts the movie title in the h1 element
+                                document.getElementById("rating").innerHTML = "Rotten Tomatoes: " + JSON.stringify(result.Ratings[1].Value); //this line puts the rating in the h2 element
+                                document.getElementById("para").innerHTML = result.Plot; //this line puts the plot in the paragraph element
+                                img.src = result.Poster; //this line inserts the poster on the browser page
+                                document.getElementById("btn").style.visibility = "visible";
+                                document.getElementById("review").style.visibility = "visible";
+                                document.getElementById("btn").addEventListener("click", function (event) {
+                                    para3 = document.createElement("p");
+                                    document.getElementById("div2").appendChild(para3);
+                                    para3.innerHTML = "Year: " + result.Year;
+                                    para3.id = "paragraph3"
+                                    para1 = document.createElement("p");
+                                    document.getElementById("div2").appendChild(para1);
+                                    para1.innerHTML = "Genre: " + result.Genre;
+                                    para1.id = "paragraph1"
+                                    para2 = document.createElement("p");
+                                    document.getElementById("div2").appendChild(para2);
+                                    para2.id = "paragraph2"
+                                    document.getElementById("btn").remove();
+                                })
+                            })
+                    })
+
+                })
+        }
+        document.addEventListener("keypress", function (event) {
+            if (event.keyCode == 13) {
+                movie()
+            } // lines 50 to 52 enact the code from lines 28 to 48 when the Enter button is clicked
+        })
+
+        function writeReview() {
+            document.getElementById("review").remove();
+            document.getElementById("diview").remove();
+            input3 = document.createElement("input");
+            document.getElementById("divname").appendChild(input3);
+            input3.placeholder = "Type Your Username Here"
+            input3.id = "nimput"
+            input2 = document.createElement("input");
+            document.getElementById("divput").appendChild(input2);
+            input2.placeholder = "Type Your Review Here"
+            input2.id = "reviewBox"
+            submitbox = document.createElement("button");
+            document.getElementById("divtn").appendChild(submitbox);
+            submitbox.innerHTML = "submit"
+            submitbox.id = "subtn"
+            submitbox.innerHTML = "Submit"
+            document.getElementById("subtn").addEventListener('click', function (event) {
+                if (document.getElementById("reviewBox").value == "" || document.getElementById("nimput").value == "") {
+                    alert("Please write your username and a review before submitting")
+                } else {
+                    var database = firebase.database();
+                    var showDatabase = document.getElementById("showDatabase")
+                    console.log(select);
+                    database.ref('/kailahMovieReview/' + select).push({
+                        user: document.getElementById("nimput").value,
+                        movieReview: document.getElementById("reviewBox").value
+                    })
+                    database.ref('/kailahMovieReview/' + select).on("value", function (snapshot) {
+                        var obj = snapshot.val();
+                        var key = Object.keys(obj);
+                        for (i = 0; i < key.length; i++) {
+                            var name1 = document.createElement("h4");
+                            document.body.appendChild(name1);
+                            name1.id = "name2"
+                            name1.innerHTML = obj[Object.keys(obj)[i]].user + ": " + obj[Object.keys(obj)[i]].movieReview;
+
+                        }
+                    })
+                    document.getElementById("reviewBox").value = ""
+                    document.getElementById("nimput").value = "";
+                    console.log(document.body.scrollHeight);
+                    setTimeout(function () {
+                        console.log(document.body.scrollHeight);
+                        window.scrollTo(0, document.body.scrollHeight);
+                    }, 1000)
+                }
+            })
+        }
+    </script>
+    <style>
+        #first {
+            font-size: 15px;
+            font-family: fantasy;
+            cursor: pointer;
+        }
+
+        #second {
+            font-size: 15px;
+            font-family: fantasy;
+            cursor: pointer;
+        }
+
+        #third {
+            font-size: 15px;
+            font-family: fantasy;
+            cursor: pointer;
+        }
+
+        #paragraph3 {
+            font-family: fantasy;
+        }
+
+        #paragraph2 {
+            font-family: fantasy;
+        }
+
+        #paragraph1 {
+            font-family: fantasy;
+        }
+
+        #nimput {
+            font-family: fantasy;
+            width: 200px;
+        }
+
+        #reviewBox {
+            font-family: fantasy;
+            width: 450px;
+        }
+
+        #subtn {
+            height: 25px;
+            width: 60px;
+            background: white;
+            cursor: pointer;
+            font-family: fantasy;
+        }
+    </style>
+</body>
+
+</html>
